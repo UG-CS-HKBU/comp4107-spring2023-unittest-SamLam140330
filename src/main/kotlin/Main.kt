@@ -25,22 +25,22 @@ class TraitorRole : Role {
     override fun getEnemy() = "Rebel, then Monarch"
 }
 
-abstract class Hero(var role: Role) : Role by role {
+abstract class Hero(val role: Role) : Role by role {
     abstract val name: String
     open val maxHP: Int = 4
     open var hp: Int = maxHP
     open var numOfCards = 4
-    public var abandon = false
+    var abandon = false
     var commands = mutableListOf<Command>()
 
-    public var index = 0
+    var index = 0
 
-    private fun getIndexOfLeftHero(numOfHeros:Int, dist: Int = 1): Int {
-        return (index + numOfHeros - dist ) % numOfHeros;
+    private fun getIndexOfLeftHero(numOfHeros: Int, dist: Int = 1): Int {
+        return (index + numOfHeros - dist) % numOfHeros
     }
 
     private fun getIndexOfRightHero(numOfHeros: Int, dist: Int = 1): Int {
-        return (index + dist) % numOfHeros;
+        return (index + dist) % numOfHeros
     }
 
     fun setCommand(command: Command) {
@@ -49,7 +49,7 @@ abstract class Hero(var role: Role) : Role by role {
 
     fun executeCommend() {
         while (commands.isNotEmpty()) {
-            var c = commands.removeAt(0)
+            val c = commands.removeAt(0)
             c.execute()
         }
     }
@@ -67,14 +67,14 @@ abstract class Hero(var role: Role) : Role by role {
     }
 
     open fun playCards() {
-        val leftHero = heroes[getIndexOfLeftHero(heroes.size)];
-        val rightHero = heroes[getIndexOfRightHero(heroes.size)];
+        val leftHero = heroes[getIndexOfLeftHero(heroes.size)]
+        val rightHero = heroes[getIndexOfRightHero(heroes.size)]
         println("${leftHero.name} is on the left-hand side, and ${rightHero.name} is on the right-hand side.")
         attack()
     }
 
     open fun drawCards() {
-        var n = 2
+        val n = 2
         numOfCards += n
 
         println("Drawing $n cards")
@@ -91,7 +91,7 @@ abstract class Hero(var role: Role) : Role by role {
     }
 
     open fun attack() {
-        var enemies = getEnemy()
+        val enemies = getEnemy()
         numOfCards--
         println("$name is $roleTitle, spent 1 card to attack $enemies.")
     }
@@ -102,7 +102,7 @@ abstract class Hero(var role: Role) : Role by role {
 
     open fun beingAttacked() {
         println("$name got attached")
-        if (!dodgeAttack()) {
+        if (!dodgeAttack() && hp > 0) {
             hp--
             println("$name is unable to dodge attack, current hp is $hp.")
         } else {
@@ -130,7 +130,7 @@ abstract class WeiHero(role: Role) : Hero(role), Handler {
         nextHandler = h
     }
 
-    override fun getNext() = nextHandler;
+    override fun getNext() = nextHandler
 
     override fun handle(): Boolean {
         var result = false
@@ -229,7 +229,7 @@ class GuanYu {
 }
 
 class GuanYuAdapter(role: Role) : WarriorHero(role) {
-    private var guanYu = GuanYu();
+    private var guanYu = GuanYu()
     override val name = guanYu.name
 
     override fun attack() {
@@ -286,7 +286,7 @@ object NoneMonarchFactory : GameObjectFactory {
         if (monarchHero is CaoCao && hero is WeiHero) {
             val cao = monarchHero as CaoCao
             if (cao.helper == null)
-                cao.helper = hero as WeiHero
+                cao.helper = hero
             else {
                 var handler: Handler? = cao.helper as Handler
 
@@ -301,7 +301,7 @@ object NoneMonarchFactory : GameObjectFactory {
 }
 
 interface Command {
-    abstract fun execute()
+    fun execute()
 }
 
 class Abandon : Command {
@@ -321,14 +321,14 @@ class Abandon : Command {
 
 
 var monarchHero: MonarchHero = MonarchFactory.createRandomHero() as MonarchHero
-var heroes = mutableListOf<Hero>();
+var heroes = mutableListOf<Hero>()
 
 fun play() {
     heroes.add(monarchHero)
     monarchHero.setCommand(Abandon(monarchHero))
     for (i in 0..2) {
-        var hero = NoneMonarchFactory.createRandomHero()
-        hero.index = heroes.size;
+        val hero = NoneMonarchFactory.createRandomHero()
+        hero.index = heroes.size
         heroes.add(hero)
     }
 
@@ -339,6 +339,6 @@ fun play() {
 }
 
 
-fun main(args: Array<String>) {
-    play();
+fun main() {
+    play()
 }
